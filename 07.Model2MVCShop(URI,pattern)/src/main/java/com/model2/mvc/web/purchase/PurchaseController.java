@@ -39,6 +39,9 @@ public class PurchaseController {
 	@Autowired
 	@Qualifier("purchaseServiceImpl")
 	private PurchaseService purchaseService;
+	@Autowired
+	@Qualifier("productServiceImpl")
+	private ProductService productService;
 	//setter Method 구현 않음
 	
 	public PurchaseController(){
@@ -57,39 +60,53 @@ public class PurchaseController {
 	
 //	@RequestMapping("/addPurchase.do")
 	@RequestMapping(value="addPurchase",method=RequestMethod.POST)
-	public ModelAndView addPurchase( @ModelAttribute("purchase") Purchase purchase )throws Exception {
+	public ModelAndView addPurchase( @ModelAttribute("purchase") Purchase purchase,
+									 HttpServletRequest request)throws Exception {
 		System.out.println("\n==> addPurchase() 시작......");
-		
 		ModelAndView modelAndView = new ModelAndView();
 		modelAndView.setViewName("/purchase/addPurchase.jsp");
 		
+
+		
+		Product product = new Product();
+		product.setProdNo(Integer.parseInt(request.getParameter("prodNo")));
+		User user = new User();
+		user.setUserId(request.getParameter("buyerId"));
+		
+		purchase.setBuyer(user);
+		purchase.setPurchaseProd(product);
+		purchase.setDivyAddr(request.getParameter("receiverAddr"));
+		purchase.setDivyDate(request.getParameter("receiverDate"));
+		purchase.setReceiverName(request.getParameter("receiverName"));
+		purchase.setReceiverPhone(request.getParameter("receiverPhone"));
+		purchase.setDivyRequest(request.getParameter("receiverRequest"));
+		purchase.setPaymentOption(request.getParameter("paymentOption"));
 		
 		//Business Logic
 		purchaseService.addPurchase(purchase);
+		modelAndView.addObject("purchase", purchase);
 		System.out.println("\n==> addPurchase() 끝......");
 		return modelAndView;
 	}
 //	@RequestMapping("/addPurchaseView.do")
 	@RequestMapping(value="addPurchaseView",method=RequestMethod.GET)
-	public ModelAndView addPurchaseView( @RequestParam("prodNo") Product prodNo,
-										 @ModelAttribute("purchase") Purchase purchase,
+	public ModelAndView addPurchaseView( @RequestParam("prodNo") int prodNo,
+										 @ModelAttribute("product")Product product,
 										 HttpSession session) throws Exception {
 		System.out.println("\n==> addPurchaseView() 시작......");
-		
-		
 		ModelAndView modelAndView = new ModelAndView();
-		modelAndView.setViewName("/purchase/addPurchase.jsp");
+		modelAndView.setViewName("/purchase/addPurchaseView.jsp");
+		
 		
 		User user = (User)session.getAttribute("user");
-//		request.setAttribute("user", user);
-		modelAndView.addObject("user", user);
-		System.out.println(prodNo);
 		
 		//Business Logic
-		purchaseService.addPurchase(purchase);
-		
-		
-		System.out.println("\n==> addPurchase() 끝......");
+	
+		product = productService.getProduct(prodNo);
+
+		modelAndView.addObject("user", user);
+		modelAndView.addObject("product",product);
+		System.out.println("\n==> addPurchaseView() 끝......");
 		return modelAndView;
 	}
 	

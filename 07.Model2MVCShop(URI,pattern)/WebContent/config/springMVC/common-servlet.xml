@@ -58,8 +58,12 @@
 	   :: Interceptor 선언 : 로그인 유무확인.
 	<bean id="logonCheckInterceptor"	class="com.model2.mvc.common.web.LogonCheckInterceptor" />
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////-->		           
+	<!--  다중 업로드  -->
+	 <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver"/>
+     
 
 
+	
 	<!--  :: ViewResolver 선언 -->	
     <bean id="viewResolver"
 				class="org.springframework.web.servlet.view.InternalResourceViewResolver" />

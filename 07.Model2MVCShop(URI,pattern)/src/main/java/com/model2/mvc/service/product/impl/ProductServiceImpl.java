@@ -36,6 +36,7 @@ public class ProductServiceImpl implements ProductService{
 
 	@Override
 	public Product getProduct(int prodNo) throws Exception {
+		System.out.println(productDao.getProduct(prodNo));
 		return productDao.getProduct(prodNo);
 	}
 

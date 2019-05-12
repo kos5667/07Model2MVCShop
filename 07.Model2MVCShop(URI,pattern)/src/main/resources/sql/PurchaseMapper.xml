@@ -25,7 +25,7 @@
 	<insert 	id="addPurchase"		parameterType="purchase" >
 		INSERT
 		INTO transaction (TRAN_NO,PROD_NO,BUYER_ID,PAYMENT_OPTION,RECEIVER_NAME,RECEIVER_PHONE,DEMAILADDR,DLVY_REQUEST,TRAN_STATUS_CODE,DLVY_DATE,ORDER_DATA)
-		VALUES (seq_transaction_tran_no.NEXTVAL,#{purchaseProd.prodNo},#{buyer.userId},#{paymentOption},#{receiverName.userName:VARCHAR},#{receiverPhone.phone:VARCHAR},#{divyAddr:VARCHAR},#{divyRequest:VARCHAR},0,SYSDATE,#{divyDate:DATE})
+		VALUES (seq_transaction_tran_no.NEXTVAL,#{purchaseProd.prodNo},#{buyer.userId},#{paymentOption},#{receiverName:VARCHAR},#{receiverPhone:VARCHAR},#{divyAddr:VARCHAR},#{divyRequest:VARCHAR},0,SYSDATE,#{divyDate:DATE})
 	</insert>
 	 
 	 <!-- SQL : SELECT ONE -->

@@ -1,23 +1,33 @@
 package com.model2.mvc.web.product;
 
+import java.io.File;
 import java.util.Map;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.FileCopyUtils;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import com.model2.mvc.common.Page;
 import com.model2.mvc.common.Search;
 import com.model2.mvc.service.domain.Product;
 import com.model2.mvc.service.product.ProductService;
+
+import jdk.nashorn.internal.ir.RuntimeNode.Request;
 
 
 //==> 회원관리 Controller
@@ -44,22 +54,36 @@ public class ProductController {
 	@Value("#{commonProperties['pageSize']}")
 	//@Value("#{commonProperties['pageSize'] ?: 2}")
 	int pageSize;
-	
+	@Value("#{commonProperties['uploadPath']}")
+	String uploadPath;
 	
 //	@RequestMapping("/addProduct.do")
 	@RequestMapping(value="addProduct",method=RequestMethod.POST)
-	public String addProduct( @ModelAttribute("product") Product product ) throws Exception {
-
+	public String addProduct( @ModelAttribute("product") Product product,
+							  @RequestParam("file") MultipartFile[] files,
+							  HttpServletResponse response
+							  /*@RequestParam("temDir")String temDir*/) throws Exception {
 		System.out.println("/product/addProduct : POST");
+		//FileUpload
+//		String temDir = "C:\\Users\\USER\\git\\07Model2MVCShop\\07.Model2MVCShop(URI,pattern)\\WebContent\\images\\uploadFiles";
+		String safeFile ="";
+		for(MultipartFile file : files) {
+			String originFileName = file.getOriginalFilename(); 
+			File target = new File(uploadPath, originFileName);
+			FileCopyUtils.copy(file.getBytes(),target);
+			safeFile += originFileName;
+		}
+		product.setFileName(safeFile);
+
 		//Business Logic
 		productService.addProduct(product);
-
 		return "forward:/product/addProduct.jsp";
 	}
 	
 //	@RequestMapping("/getProduct.do")
 	@RequestMapping(value="getProduct", method=RequestMethod.GET)
-	public String getProduct( @RequestParam("prodNo") int prodNo , Model model ) throws Exception {
+	public String getProduct( @RequestParam("prodNo") int prodNo , Model model,
+							  HttpServletRequest request,HttpServletResponse response/*,@CookieValue(value="history",required=false)String history*/) throws Exception {
 		
 		System.out.println("/product/getProduct.do");
 		
@@ -68,6 +92,35 @@ public class ProductController {
 		// Model 과 View 연결
 		model.addAttribute("product", product);
 		
+		Cookie[] cookies = request.getCookies();
+		Cookie c = null;
+		String history = null;
+		if (cookies!=null && cookies.length > 0) {//쿠키 null체크			
+			for (int i=0; i < cookies.length; i++) {
+				c = cookies[i];					
+				System.out.println("쿠키쿠키 = "+c.getValue());
+				if (c.getName().equals("history")) {
+					history = c.getValue();
+					if(history.indexOf(Integer.toString(prodNo)) == -1) {
+						history += ","+prodNo;
+						c = new Cookie("history", history);
+					}
+					break;
+				}
+			}
+			if (history == null) {
+//				history += prodNo;
+				c = new Cookie("history",Integer.toString(prodNo));
+				
+			}
+		}else {
+			c = new Cookie("history", history);
+		}
+		c.setMaxAge(60*60);
+		c.setPath("/history.jsp");
+//		System.out.println(c.getPath());
+		response.addCookie(c);
+//		System.out.println("history = "+c.getValue());
 		return "forward:/product/getProduct.jsp";
 	}
 	

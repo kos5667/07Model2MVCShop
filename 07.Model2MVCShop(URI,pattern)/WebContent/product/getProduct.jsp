@@ -70,8 +70,8 @@
 			align="absmiddle" />
 		</td>
 		<td bgcolor="D6D6D6" width="1"></td>
-		<td class="ct_write01"><img
-			src="/images/uploadFiles/../../images/empty.GIF" /></td>
+		<td class="ct_write01">
+		<img src="../images/uploadFiles/${product.fileName }"></td>
 	</tr>
 	<tr>
 		<td height="1" colspan="3" bgcolor="D6D6D6"></td>

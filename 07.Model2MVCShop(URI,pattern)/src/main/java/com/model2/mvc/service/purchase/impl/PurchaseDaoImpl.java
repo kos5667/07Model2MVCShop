@@ -30,7 +30,7 @@ public class PurchaseDaoImpl implements PurchaseDao {
 	}
 	
 	public void addPurchase(Purchase purchase) throws Exception{
-		
+		System.out.println("Mapper로 들어가는 "+purchase);
 		this.sqlSession.insert("PurchaseMapper.addPurchase",purchase);
 	}
 	
